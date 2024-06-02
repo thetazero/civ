@@ -2,6 +2,8 @@ use crate::game::tile::{Tile, TileData};
 use crate::game::WorldState;
 use noise::{NoiseFn, Simplex};
 
+use super::hex::{Coordinate, Hex, HexIndex};
+
 const WATER_LEVEL: f32 = 0.2;
 
 fn gen_tile_biome(height: f64, biome: f64) -> Tile {
@@ -26,40 +28,24 @@ fn scaled_simplex_2d(simplex: Simplex, x: f64, y: f64, scale: f64) -> f64 {
     simplex.get([x * scale, y * scale])
 }
 
-pub fn spawn_empty_map() -> Vec<Vec<Tile>> {
-    let mut map = vec![];
-    for _ in 0..10 {
-        let mut row = vec![];
-        for _ in 0..10 {
-            let tile = Tile::Unknown;
-            row.push(tile);
-        }
-        map.push(row);
-    }
-    map
-}
+pub fn tile_biome(coordinate: Coordinate, simplex_2d: &Simplex) -> Tile {
+    let x_float = coordinate.x;
+    let y_float = coordinate.y;
 
-pub fn spawn_biomes(mut map: Vec<Vec<Tile>>) -> Vec<Vec<Tile>> {
-    let simplex_2d = Simplex::new(2);
+    let height = scaled_simplex_2d(*simplex_2d, x_float, y_float, 0.05 / 2.);
+    let biome = scaled_simplex_2d(*simplex_2d, x_float, y_float, 0.02 / 2.);
 
-    for (x, row) in map.iter_mut().enumerate() {
-        for (y, tile) in row.iter_mut().enumerate() {
-            let x_float = x as f64;
-            let y_float = y as f64;
-
-            let height = scaled_simplex_2d(simplex_2d, x_float, y_float, 0.05 / 2.);
-            let biome = scaled_simplex_2d(simplex_2d, x_float, y_float, 0.02 / 2.);
-
-            *tile = gen_tile_biome(height, biome)
-        }
-    }
-
-    map
+    gen_tile_biome(height, biome)
 }
 
 pub fn generate() -> WorldState {
-    let mut map = spawn_empty_map();
-    map = spawn_biomes(map);
+    let simplex_2d = Simplex::new(2);
+
+    let mut map = Hex::new(10, 10, Tile::Unknown);
+    map.map_mut(|_, index| {
+        let coordinate = index.to_coords();
+        tile_biome(coordinate, &simplex_2d)
+    });
 
     WorldState { map }
 }

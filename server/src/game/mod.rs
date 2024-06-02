@@ -1,4 +1,5 @@
 use rocket::serde::{Deserialize, Serialize};
+use crate::game::hex::Hex;
 
 mod building;
 mod worldgen;
@@ -9,7 +10,7 @@ mod hex;
 #[serde(crate = "rocket::serde")]
 #[derive(Clone)]
 pub struct WorldState {
-    pub map: Vec<Vec<tile::Tile>>,
+    pub map: Hex<tile::Tile>,
 }
 
 #[derive(Serialize, Deserialize)]

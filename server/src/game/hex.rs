@@ -1,11 +1,15 @@
+use rocket::serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(crate = "rocket::serde")]
 pub struct Hex<T> {
-    data: Vec<Vec<T>>,
+    pub data: Vec<Vec<T>>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct HexIndex {
-    row: usize,
-    col: usize,
+    pub row: usize,
+    pub col: usize,
 }
 
 pub enum HexDirection {
@@ -19,8 +23,8 @@ pub enum HexDirection {
 
 #[derive(Debug, PartialEq)]
 pub struct Coordinate {
-    x: f64,
-    y: f64,
+    pub x: f64,
+    pub y: f64,
 }
 
 // based on: https://www.redblobgames.com/grids/hexagons/
@@ -40,14 +44,14 @@ impl<T: Clone> Hex<T> {
 
     pub fn map_mut(
         &mut self,
-        map: fn(tile: &mut T, index: HexIndex, location: Coordinate) -> T,
+        map: impl Fn(&T, HexIndex) -> T,
     ) -> &mut Hex<T> {
         for (i, row) in self.data.iter_mut().enumerate() {
             for (j, tile) in row.iter_mut().enumerate() {
                 let index = HexIndex { row: i, col: j };
-                let location = index.too_coords();
+                let location = index.to_coords();
                 println!("{:?} {:?}", index, location);
-                *tile = map(tile, index, location);
+                *tile = map(tile, index);
             }
         }
         self
@@ -115,7 +119,7 @@ impl HexIndex {
         }
     }
 
-    pub fn too_coords(self: &HexIndex) -> Coordinate {
+    pub fn to_coords(self: &HexIndex) -> Coordinate {
         let size = 1.0;
         let x = size * f64::sqrt(3.0) * (self.col as f64 + 0.5 * (self.row % 2) as f64);
         let y = size * 3.0 / 2.0 * self.row as f64;
@@ -130,10 +134,9 @@ mod tests {
     #[test]
     fn test_create() {
         let mut hex = Hex::new(10, 10, 0);
-        hex.map_mut(|tile, index, location| {
-            println!("{:?} {:?}", index, location);
-            *tile = 1;
-            *tile
+        hex.map_mut(|tile, index| {
+            println!("{:?}", index);
+            1
         });
     }
 
