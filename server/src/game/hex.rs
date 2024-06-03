@@ -4,9 +4,11 @@ use rocket::serde::{Deserialize, Serialize};
 #[serde(crate = "rocket::serde")]
 pub struct Hex<T> {
     pub data: Vec<Vec<T>>,
+    pub rows: usize,
+    pub cols: usize,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct HexIndex {
     pub row: usize,
     pub col: usize,
@@ -30,6 +32,10 @@ pub struct Coordinate {
 // based on: https://www.redblobgames.com/grids/hexagons/
 // odd-r offset coordinates
 impl<T: Clone> Hex<T> {
+    pub fn get(&self, index: HexIndex) -> Option<&T> {
+        self.data.get(index.row).and_then(|row| row.get(index.col))
+    }
+
     pub fn new(rows: usize, cols: usize, default: T) -> Self {
         let mut data = vec![];
         for _ in 0..rows {
@@ -39,13 +45,11 @@ impl<T: Clone> Hex<T> {
             }
             data.push(row);
         }
-        Hex { data }
+        Hex { data, rows, cols }
     }
 
-    pub fn map_mut(
-        &mut self,
-        map: impl Fn(&T, HexIndex) -> T,
-    ) -> &mut Hex<T> {
+    /// Apply a function to each tile in the hex grid (mutates the grid in place)
+    pub fn map(&mut self, map: impl Fn(&T, HexIndex) -> T) -> &mut Hex<T> {
         for (i, row) in self.data.iter_mut().enumerate() {
             for (j, tile) in row.iter_mut().enumerate() {
                 let index = HexIndex { row: i, col: j };
@@ -133,11 +137,15 @@ mod tests {
 
     #[test]
     fn test_create() {
-        let mut hex = Hex::new(10, 10, 0);
-        hex.map_mut(|tile, index| {
+        let mut hex = Hex::new(12, 10, 0);
+        hex.map(|_, index| {
             println!("{:?}", index);
             1
         });
+        assert_eq!(hex.data[0][0], 1);
+        assert_eq!(hex.data[11][9], 1);
+        assert_eq!(hex.rows, 12);
+        assert_eq!(hex.cols, 10);
     }
 
     #[test]

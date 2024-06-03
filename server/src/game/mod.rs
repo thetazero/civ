@@ -1,10 +1,12 @@
-use rocket::serde::{Deserialize, Serialize};
 use crate::game::hex::Hex;
+use rocket::serde::{Deserialize, Serialize};
+
+pub mod hex;
+pub mod tile;
 
 mod building;
+mod items;
 mod worldgen;
-mod tile;
-mod hex;
 
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]

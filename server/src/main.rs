@@ -1,4 +1,4 @@
-use game::Game;
+use game::{hex::HexIndex, Game, tile::Tile};
 use rand::Rng;
 use rocket::serde::json::Json;
 use rocket::State;
@@ -32,12 +32,21 @@ async fn game_all(game: &State<Game>) -> Json<Game> {
     Json(game.clone())
 }
 
+#[get("/tile/<row>/<col>")]
+async fn get_tile(game: &State<Game>, row: usize, col: usize) -> Json<Tile> {
+    let tile = game.world_state.map.get(HexIndex { row, col });
+    match tile {
+        Some(tile) => Json(*tile),
+        None => panic!("Tile not found")
+    }
+}
+
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
     let _rocket = rocket::build()
         .mount("/", routes![index])
         .mount("/random", routes![random_wait])
-        .mount("/game", routes![game_name, game_all])
+        .mount("/game", routes![game_name, game_all, get_tile])
         .manage(Game::new())
         .launch()
         .await?;
