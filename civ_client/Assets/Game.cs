@@ -11,30 +11,16 @@ public class Game : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // StartCoroutine(serverIO.LoadAll(
-        //  (GameData data) =>
-        //  {
-        //      Debug.Log("Recieved data: " + data);
-        //      WorldMap map = data.world_state.map;
-        //      for (int i = 0; i < map.rows; i++)
-        //      {
-        //          for (int j = 0; j < map.cols; j++)
-        //          {
-        //              Debug.Log("HexData: " + i + " " + j + " " + map.data[i][j].kind);
-        //              HexData hexData = map.data[i][j];
-        //              GameObject hex = Instantiate(hexPrefab);
-        //              hex.transform.position = hex_to_location(i, j, hex_size);
-        //          }
-        //      }
-        //  }
-        // ));
-        StartCoroutine(serverIO.loadHex(
-            0, 0,
-            (HexData data) =>
+        StartCoroutine(serverIO.loadAllHex(
+            (IndexedHex[] data) =>
             {
-                Debug.Log("Recieved data: " + data.kind);
-                GameObject hex = Instantiate(hexPrefab);
-                hex.transform.position = hex_to_location(0, 0, hex_size);
+                Debug.Log("Recieved data: " + data);
+                foreach (IndexedHex hex in data)
+                {
+                    Debug.Log("HexData: " + hex.idx.row + " " + hex.idx.col + " " + hex.tile.kind);
+                    GameObject hexObj = Instantiate(hexPrefab, transform);
+                    hexObj.transform.position = hex_to_location(hex.idx.row, hex.idx.col, hex_size);
+                }
             }
         ));
     }
@@ -42,8 +28,8 @@ public class Game : MonoBehaviour
     Vector3 hex_to_location(int row, int col, float hex_size)
     {
         float x = hex_size * Mathf.Sqrt(3f) * (col + 0.5f * (row & 1));
-        float y = hex_size * 3f / 2f * row;
-        return new Vector3(x, y, 0f);
+        float z = hex_size * 3f / 2f * row;
+        return new Vector3(x, 0f, z);
     }
 
     // Update is called once per frame

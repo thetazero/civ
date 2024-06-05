@@ -1,6 +1,7 @@
-use game::{hex::HexIndex, Game, tile::Tile};
+use game::{hex::HexIndex, tile::Tile, Game};
 use rand::Rng;
 use rocket::serde::json::Json;
+use rocket::serde::{Deserialize, Serialize};
 use rocket::State;
 
 mod game;
@@ -37,8 +38,31 @@ async fn get_tile(game: &State<Game>, row: usize, col: usize) -> Json<Tile> {
     let tile = game.world_state.map.get(HexIndex { row, col });
     match tile {
         Some(tile) => Json(*tile),
-        None => panic!("Tile not found")
+        None => panic!("Tile not found"),
     }
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+struct IndexedHex {
+    idx: HexIndex,
+    tile: Tile,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+struct Stupid<T> {
+    pub data: T,
+}
+
+#[get("/tile/all")]
+async fn all_tiles(game: &State<Game>) -> Json<Stupid<Vec<IndexedHex>>> {
+    Json(Stupid {
+        data: game.world_state.map.collect(|index, tile| IndexedHex {
+            idx: *index,
+            tile: *tile,
+        }),
+    })
 }
 
 #[rocket::main]
@@ -46,7 +70,7 @@ async fn main() -> Result<(), rocket::Error> {
     let _rocket = rocket::build()
         .mount("/", routes![index])
         .mount("/random", routes![random_wait])
-        .mount("/game", routes![game_name, game_all, get_tile])
+        .mount("/game", routes![game_name, game_all, get_tile, all_tiles])
         .manage(Game::new())
         .launch()
         .await?;

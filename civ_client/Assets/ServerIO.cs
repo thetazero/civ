@@ -27,7 +27,7 @@ public class ServerIO
 
     public IEnumerator loadHex(
         int row, int col,
-        Action<HexData> callback
+        Action<TileData> callback
     )
     {
         UnityWebRequest req = UnityWebRequest.Get(prefix + "game/tile/" + row + "/" + col);
@@ -39,7 +39,25 @@ public class ServerIO
         else
         {
             Debug.Log("Received: " + req.downloadHandler.text);
-            HexData data = JsonUtility.FromJson<HexData>(req.downloadHandler.text);
+            TileData data = JsonUtility.FromJson<TileData>(req.downloadHandler.text);
+            callback(data);
+        }
+    }
+
+    public IEnumerator loadAllHex(
+        Action<IndexedHex[]> callback
+    )
+    {
+        UnityWebRequest req = UnityWebRequest.Get(prefix + "game/tile/all");
+        yield return req.SendWebRequest();
+        if (req.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(req.error);
+        }
+        else
+        {
+            Debug.Log("Received: " + req.downloadHandler.text);
+            IndexedHex[] data = JsonUtility.FromJson<Stupid<IndexedHex[]>>(req.downloadHandler.text).data;
             callback(data);
         }
     }
@@ -60,20 +78,53 @@ public class WorldState
 [System.Serializable]
 public class WorldMap
 {
-    public HexData[][] data;
+    public IndexedHex[] data;
     public int rows;
     public int cols;
 }
 
 [System.Serializable]
-public class HexData
+public class IndexedHex
+{
+    public HexIndex idx;
+    public TileData tile;
+}
+
+public enum TileKind
+{
+    Desert,
+    Forest,
+    Mountain,
+    SnowyMountain,
+    Shallows,
+    Ocean,
+    Beach,
+    Unknown,
+}
+
+[System.Serializable]
+public class TileData
 {
     public string kind;
     public BuildingData building;
 }
 
+
 [System.Serializable]
 public class BuildingData
 {
 
+}
+
+[System.Serializable]
+public class HexIndex
+{
+    public int row;
+    public int col;
+}
+
+[System.Serializable]
+public class Stupid<T>
+{
+    public T data;
 }

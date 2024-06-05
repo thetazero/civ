@@ -8,7 +8,8 @@ pub struct Hex<T> {
     pub cols: usize,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone, Copy)]
+#[serde(crate = "rocket::serde")]
 pub struct HexIndex {
     pub row: usize,
     pub col: usize,
@@ -59,6 +60,23 @@ impl<T: Clone> Hex<T> {
             }
         }
         self
+    }
+
+    pub fn for_each(&self, mut action: impl FnMut(&HexIndex, &T)) {
+        for (i, row) in self.data.iter().enumerate() {
+            for (j, tile) in row.iter().enumerate() {
+                let index = HexIndex { row: i, col: j };
+                action(&index, tile);
+            }
+        }
+    }
+
+    pub fn collect<U>(&self, mut map: impl FnMut(&HexIndex, &T) -> U) -> Vec<U> {
+        let mut result = vec![];
+        self.for_each(|index, tile| {
+            result.push(map(index, tile));
+        });
+        result
     }
 }
 
