@@ -31,7 +31,6 @@ public class RTS_Camera : MonoBehaviour
         if (Input.GetMouseButtonDown(2))
         {
             Vector3 selected = click_position();
-            Debug.Log(selected);
         }
         velocity.x *= 1f - pan_damping * Time.deltaTime;
         velocity.z *= 1f - pan_damping * Time.deltaTime;
@@ -42,8 +41,6 @@ public class RTS_Camera : MonoBehaviour
         velocity.z = Mathf.Clamp(velocity.z, -max_pan_speed, max_pan_speed);
         velocity.y = Mathf.Clamp(velocity.y, -max_zoom_speed, max_zoom_speed);
         velocity += velocity_bounds_adjust(transform.position) * Time.deltaTime * bounding_constant;
-
-        Debug.Log(velocity);
 
         transform.position += velocity;
         transform.rotation = rotation_from_height(transform.position.y);

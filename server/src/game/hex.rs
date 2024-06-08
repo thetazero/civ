@@ -179,5 +179,17 @@ mod tests {
             index.offset(&HexDirection::UpRight),
             HexIndex { row: 4, col: 4 }
         );
+
+        let index = HexIndex { row: 2, col: 12 };
+        assert_eq!(
+            index.offset(&HexDirection::UpRight).offset(&HexDirection::DownLeft),
+            index
+        );
+
+        let index = HexIndex { row: 3, col: 7 };
+        assert_eq!(
+            index.offset(&HexDirection::UpRight).offset(&HexDirection::DownRight).offset(&HexDirection::DownLeft).offset(&HexDirection::Left),
+            index.offset(&HexDirection::UpLeft).offset(&HexDirection::DownLeft).offset(&HexDirection::DownRight)
+        );
     }
 }

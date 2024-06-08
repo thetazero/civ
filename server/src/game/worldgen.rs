@@ -65,8 +65,8 @@ pub fn pick_empire_locations(empire_count: usize, rows: usize, cols: usize) -> H
 }
 
 pub fn generate() -> WorldState {
-    let rows = 10;
-    let cols = 10;
+    let rows = 50;
+    let cols = 50;
     let empire_count = 3;
 
     let simplex_2d = Simplex::new(2);

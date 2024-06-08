@@ -160,7 +160,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -483,8 +483,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5add8084d920e0800b88ef30df640199, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hexPrefab: {fileID: 4927907650321286768, guid: bb41d17c1f541cc5c949ec64f81d51fe,
+  tileDesert: {fileID: 4927907650321286768, guid: 5e0b3a0e5a60152a6a630a6ae86f4615,
     type: 3}
+  tileForest: {fileID: 4927907650321286768, guid: bb41d17c1f541cc5c949ec64f81d51fe,
+    type: 3}
+  tileMountain: {fileID: 4927907650321286768, guid: 4d970fd68de7e2b6e930fe0fa4cf3634,
+    type: 3}
+  tileSnowyMountain: {fileID: 4927907650321286768, guid: dc7cd7f2142a8e530bfb922c1f4cc70a,
+    type: 3}
+  tileShallows: {fileID: 4927907650321286768, guid: 66ab8e4317f060ac192d82f489631ec9,
+    type: 3}
+  tileOcean: {fileID: 4927907650321286768, guid: 1e6320655c581bc5194846d0291b5063,
+    type: 3}
+  tileBeach: {fileID: 0}
 --- !u!1 &2132394052
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,7 +597,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.5, z: 0}
-  m_LocalScale: {x: 10, y: 1, z: 10}
+  m_LocalScale: {x: 100, y: 1, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
