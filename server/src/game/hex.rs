@@ -1,4 +1,5 @@
 use rocket::serde::{Deserialize, Serialize};
+use std::ops::{Index, IndexMut};
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(crate = "rocket::serde")]
@@ -35,6 +36,18 @@ pub struct Coordinate {
 impl<T: Clone> Hex<T> {
     pub fn get(&self, index: HexIndex) -> Option<&T> {
         self.data.get(index.row).and_then(|row| row.get(index.col))
+    }
+
+    pub fn set(&mut self, index: HexIndex, value: T) {
+        if let Some(row) = self.data.get_mut(index.row) {
+            if let Some(tile) = row.get_mut(index.col) {
+                *tile = value;
+            }
+        } 
+    }
+
+    pub fn get_mut(&mut self, index: HexIndex) -> Option<&mut T> {
+        self.data.get_mut(index.row).and_then(|row| row.get_mut(index.col))
     }
 
     pub fn new(rows: usize, cols: usize, default: T) -> Self {

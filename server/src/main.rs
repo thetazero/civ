@@ -49,20 +49,14 @@ struct IndexedHex {
     tile: Tile,
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(crate = "rocket::serde")]
-struct Stupid<T> {
-    pub data: T,
-}
-
 #[get("/tile/all")]
-async fn all_tiles(game: &State<Game>) -> Json<Stupid<Vec<IndexedHex>>> {
-    Json(Stupid {
-        data: game.world_state.map.collect(|index, tile| IndexedHex {
+async fn all_tiles(game: &State<Game>) -> Json<Vec<IndexedHex>> {
+    Json(
+        game.world_state.map.collect(|index, tile| IndexedHex {
             idx: *index,
             tile: *tile,
-        }),
-    })
+        })
+    )
 }
 
 #[rocket::main]

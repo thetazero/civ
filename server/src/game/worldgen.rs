@@ -5,6 +5,7 @@ use rand::Rng;
 use std::collections::HashSet;
 
 use super::hex::{Coordinate, Hex, HexIndex};
+use super::building;
 
 const WATER_LEVEL: f32 = 0.2;
 
@@ -64,6 +65,22 @@ pub fn pick_empire_locations(empire_count: usize, rows: usize, cols: usize) -> H
     );
 }
 
+fn place_empires(map: &mut Hex<Tile>, empire_locations: HashSet<HexIndex>) -> &mut Hex<Tile> {
+    let mut empire_id = 0;
+    for index in empire_locations {
+        let tile = map.get_mut(index).unwrap();
+        tile.building = Some(
+            building::Building {
+                kind: building::BuildingKind::Capital,
+                owner: empire_id,
+            }
+        );
+        empire_id += 1;
+    }
+
+    map
+}
+
 pub fn generate() -> WorldState {
     let rows = 50;
     let cols = 50;
@@ -76,7 +93,9 @@ pub fn generate() -> WorldState {
         let coordinate = index.to_coords();
         tile_biome(coordinate, &simplex_2d)
     });
+
     let empire_locations = pick_empire_locations(empire_count, rows, cols);
+    place_empires(&mut map, empire_locations);
 
     WorldState { map }
 }

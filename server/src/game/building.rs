@@ -2,18 +2,27 @@ use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
-pub enum Building {
-    Capital(Capital),
+pub struct Building {
+    pub kind: BuildingKind,
+    pub owner: i32,
 }
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
-pub struct Capital {}
+pub enum BuildingKind {
+    Capital,
+}
 
 impl Building {
     pub fn name(self: &Building) -> String {
+        return self.kind.name();
+    }
+}
+
+impl BuildingKind {
+    pub fn name(self: &BuildingKind) -> String {
         match self {
-            Building::Capital(_) => "Capital".to_string(),
+            BuildingKind::Capital => "Capital".to_string(),
         }
     }
 }

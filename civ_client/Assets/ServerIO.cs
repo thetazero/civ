@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
 using System;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 public class ServerIO
 {
@@ -45,7 +47,7 @@ public class ServerIO
     }
 
     public IEnumerator loadAllHex(
-        Action<IndexedHex[]> callback
+        Action<List<IndexedHex>> callback
     )
     {
         UnityWebRequest req = UnityWebRequest.Get(prefix + "game/tile/all");
@@ -57,36 +59,42 @@ public class ServerIO
         else
         {
             Debug.Log("Received: " + req.downloadHandler.text);
-            IndexedHex[] data = JsonUtility.FromJson<Stupid<IndexedHex[]>>(req.downloadHandler.text).data;
+            List<IndexedHex> data = JsonConvert.DeserializeObject<List<IndexedHex>>(req.downloadHandler.text);
             callback(data);
         }
     }
 }
 
-[System.Serializable]
 public class GameData
 {
+    [JsonProperty("world_state")]
     public WorldState world_state;
 }
 
-[System.Serializable]
 public class WorldState
 {
+    [JsonProperty("map")]
     public WorldMap map;
 }
 
-[System.Serializable]
 public class WorldMap
 {
+    [JsonProperty("data")]
     public IndexedHex[] data;
+
+    [JsonProperty("rows")]
     public int rows;
+
+    [JsonProperty("cols")]
     public int cols;
 }
 
-[System.Serializable]
 public class IndexedHex
 {
+    [JsonProperty("idx")]
     public HexIndex idx;
+
+    [JsonProperty("tile")]
     public TileData tile;
 }
 
@@ -102,30 +110,28 @@ public enum TileKind
     Unknown,
 }
 
-[System.Serializable]
 public class TileData
 {
+    [JsonProperty("kind")]
     public string kind;
-    public BuildingData building;
+
+    [JsonProperty("building")]
+    public BuildingData? building;
 }
 
 
-[System.Serializable]
 public class BuildingData
 {
+    [JsonProperty("kind")]
     public string kind;
+    [JsonProperty("owner")]
     public int owner;
 }
 
-[System.Serializable]
 public class HexIndex
 {
+    [JsonProperty("row")]
     public int row;
+    [JsonProperty("col")]
     public int col;
-}
-
-[System.Serializable]
-public class Stupid<T>
-{
-    public T data;
 }

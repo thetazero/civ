@@ -5,7 +5,7 @@ pub mod hex;
 pub mod tile;
 
 mod building;
-mod items;
+mod resource;
 mod worldgen;
 
 #[derive(Serialize, Deserialize)]

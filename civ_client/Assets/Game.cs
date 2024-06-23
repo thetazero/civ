@@ -22,7 +22,7 @@ public class Game : MonoBehaviour
     void Start()
     {
         StartCoroutine(serverIO.loadAllHex(
-            (IndexedHex[] data) =>
+            (List<IndexedHex> data) =>
             {
                 foreach (IndexedHex hex in data)
                 {
