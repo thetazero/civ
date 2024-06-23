@@ -113,7 +113,8 @@ public class TileData
 [System.Serializable]
 public class BuildingData
 {
-
+    public string kind;
+    public int owner;
 }
 
 [System.Serializable]

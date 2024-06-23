@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -23,44 +24,65 @@ public class Game : MonoBehaviour
         StartCoroutine(serverIO.loadAllHex(
             (IndexedHex[] data) =>
             {
-                Debug.Log("Recieved data: " + data);
                 foreach (IndexedHex hex in data)
                 {
                     // Debug.Log("HexData: " + hex.idx.row + " " + hex.idx.col + " " + hex.tile.kind);
-                    GameObject hexObj = null;
-                    if (hex.tile.kind == "Desert" && tileDesert != null)
+                    GameObject hexObj = SpawnTile(hex.tile.kind, hex.idx);
+                    if (hex.tile.building != null)
                     {
-                        hexObj = tileDesert;
-                    } else if (hex.tile.kind == "Forest" && tileForest != null)
-                    {
-                        hexObj = tileForest;
-                    } else if (hex.tile.kind == "Mountain" && tileMountain != null)
-                    {
-                        hexObj = tileMountain;
-                    } else if (hex.tile.kind == "SnowyMountain" && tileSnowyMountain != null)
-                    {
-                        hexObj = tileSnowyMountain;
-                    } else if (hex.tile.kind == "Shallows" && tileShallows != null)
-                    {
-                        hexObj = tileShallows;
-                    } else if (hex.tile.kind == "Ocean" && tileOcean != null)
-                    {
-                        hexObj = tileOcean;
-                    } else if (hex.tile.kind == "Beach" && tileBeach != null)
-                    {
-                        hexObj = tileBeach;
-                    } else {
-                        Debug.Log("Unknown tile kind: " + hex.tile.kind);
-                    }
-
-                    if (hexObj != null)
-                    {
-                        hexObj = Instantiate(hexObj);
-                        hexObj.transform.position = hex_to_location(hex.idx.row, hex.idx.col, hex_size);
+                        BuildingData buildingData = hex.tile.building;
+                        Debug.Log("Building: " + buildingData.kind);
+                        Debug.Log("Building owner: " + buildingData.owner);
                     }
                 }
             }
         ));
+    }
+
+    GameObject SpawnTile(String kind, HexIndex idx)
+    {
+
+        GameObject hexObj = null;
+        if (kind == "Desert" && tileDesert != null)
+        {
+            hexObj = tileDesert;
+        }
+        else if (kind == "Forest" && tileForest != null)
+        {
+            hexObj = tileForest;
+        }
+        else if (kind == "Mountain" && tileMountain != null)
+        {
+            hexObj = tileMountain;
+        }
+        else if (kind == "SnowyMountain" && tileSnowyMountain != null)
+        {
+            hexObj = tileSnowyMountain;
+        }
+        else if (kind == "Shallows" && tileShallows != null)
+        {
+            hexObj = tileShallows;
+        }
+        else if (kind == "Ocean" && tileOcean != null)
+        {
+            hexObj = tileOcean;
+        }
+        else if (kind == "Beach" && tileBeach != null)
+        {
+            hexObj = tileBeach;
+        }
+        else
+        {
+            Debug.Log("Unknown tile kind: " + kind);
+        }
+
+        if (hexObj != null)
+        {
+            hexObj = Instantiate(hexObj);
+            hexObj.transform.position = hex_to_location(idx.row, idx.col, hex_size);
+        }
+
+        return hexObj;
     }
 
     Vector3 hex_to_location(int row, int col, float hex_size)
