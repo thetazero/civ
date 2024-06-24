@@ -1,9 +1,12 @@
+#nullable enable
+
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
 using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+
 
 public class ServerIO
 {
@@ -113,7 +116,7 @@ public enum TileKind
 public class TileData
 {
     [JsonProperty("kind")]
-    public string kind;
+    public TileKind kind;
 
     [JsonProperty("building")]
     public BuildingData? building;
@@ -123,7 +126,7 @@ public class TileData
 public class BuildingData
 {
     [JsonProperty("kind")]
-    public string kind;
+    public BuildingKind kind;
     [JsonProperty("owner")]
     public int owner;
 }
@@ -134,4 +137,10 @@ public class HexIndex
     public int row;
     [JsonProperty("col")]
     public int col;
+}
+
+
+public enum BuildingKind
+{
+    Capital
 }

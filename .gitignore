@@ -9,6 +9,7 @@ civ_client/[Bb]uild/
 civ_client/[Bb]uilds/
 civ_client/[Ll]ogs/
 civ_client/[Uu]ser[Ss]ettings/
+civ_client/*.meta
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data

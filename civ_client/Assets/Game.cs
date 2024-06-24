@@ -16,6 +16,9 @@ public class Game : MonoBehaviour
     public GameObject tileOcean;
     public GameObject tileBeach;
 
+
+    public GameObject buildingCity;
+
     private ServerIO serverIO = new ServerIO();
     private float hex_size = 1.0f;
     // Start is called before the first frame update
@@ -30,44 +33,64 @@ public class Game : MonoBehaviour
                     GameObject hexObj = SpawnTile(hex.tile.kind, hex.idx);
                     if (hex.tile.building != null)
                     {
-                        BuildingData buildingData = hex.tile.building;
-                        Debug.Log("Building: " + buildingData.kind);
-                        Debug.Log("Building owner: " + buildingData.owner);
+                        SpawnBuilding(hex.tile.building, hexObj);
                     }
                 }
             }
         ));
     }
 
-    GameObject SpawnTile(String kind, HexIndex idx)
+    GameObject SpawnBuilding(BuildingData data, GameObject parentHex)
+    {
+
+        Debug.Log("Building: " + data.kind);
+        Debug.Log("Building owner: " + data.owner);
+
+        GameObject buildingObj = null;
+        switch (data.kind)
+        {
+            case BuildingKind.Capital:
+                buildingObj = Instantiate(buildingCity, parentHex.transform.position, Quaternion.Euler(90, 0, 0), parentHex.transform);
+                break;
+        }
+        buildingObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+        Material mat = buildingObj.GetComponent<Renderer>().material;
+
+        mat.color = Color.HSVToRGB(data.owner / 10.0f, 1.0f, 1.0f);
+
+        return buildingObj;
+    }
+
+    GameObject SpawnTile(TileKind kind, HexIndex idx)
     {
 
         GameObject hexObj = null;
-        if (kind == "Desert" && tileDesert != null)
+        if (kind == TileKind.Desert && tileDesert != null)
         {
             hexObj = tileDesert;
         }
-        else if (kind == "Forest" && tileForest != null)
+        else if (kind == TileKind.Forest && tileForest != null)
         {
             hexObj = tileForest;
         }
-        else if (kind == "Mountain" && tileMountain != null)
+        else if (kind == TileKind.Mountain && tileMountain != null)
         {
             hexObj = tileMountain;
         }
-        else if (kind == "SnowyMountain" && tileSnowyMountain != null)
+        else if (kind == TileKind.SnowyMountain && tileSnowyMountain != null)
         {
             hexObj = tileSnowyMountain;
         }
-        else if (kind == "Shallows" && tileShallows != null)
+        else if (kind == TileKind.Shallows && tileShallows != null)
         {
             hexObj = tileShallows;
         }
-        else if (kind == "Ocean" && tileOcean != null)
+        else if (kind == TileKind.Ocean && tileOcean != null)
         {
             hexObj = tileOcean;
         }
-        else if (kind == "Beach" && tileBeach != null)
+        else if (kind == TileKind.Beach && tileBeach != null)
         {
             hexObj = tileBeach;
         }
