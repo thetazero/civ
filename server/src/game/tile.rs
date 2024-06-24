@@ -16,6 +16,19 @@ impl Tile {
             building: None,
         }
     }
+
+    pub fn is_spawnable(self: &Tile) -> bool {
+        match self.kind {
+            TileKind::Desert => true,
+            TileKind::Forest => true,
+            TileKind::Mountain => true,
+            TileKind::SnowyMountain => true,
+            TileKind::Shallows => false,
+            TileKind::Ocean => false,
+            TileKind::Beach => true,
+            TileKind::Unknown => false,
+        }
+    }
 }
 
 

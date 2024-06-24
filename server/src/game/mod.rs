@@ -1,5 +1,6 @@
 use crate::game::hex::Hex;
 use rocket::serde::{Deserialize, Serialize};
+use worldgen::WorldGenConfig;
 
 pub mod hex;
 pub mod tile;
@@ -25,7 +26,13 @@ pub struct Game {
 impl Game {
     pub fn new() -> Self {
         Game {
-            world_state: worldgen::generate(),
+            world_state: worldgen::generate(
+                WorldGenConfig {
+                    rows: 30,
+                    cols: 30,
+                    empire_count: 10,
+                }
+            ),
         }
     }
 

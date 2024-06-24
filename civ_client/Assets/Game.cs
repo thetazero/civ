@@ -53,7 +53,7 @@ public class Game : MonoBehaviour
                 buildingObj = Instantiate(buildingCity, parentHex.transform.position, Quaternion.Euler(90, 0, 0), parentHex.transform);
                 break;
         }
-        buildingObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        buildingObj.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
 
         Material mat = buildingObj.GetComponent<Renderer>().material;
 

@@ -4,8 +4,8 @@ use noise::{NoiseFn, Simplex};
 use rand::Rng;
 use std::collections::HashSet;
 
-use super::hex::{Coordinate, Hex, HexIndex};
 use super::building;
+use super::hex::{Coordinate, Hex, HexIndex};
 
 const WATER_LEVEL: f32 = 0.2;
 
@@ -41,7 +41,12 @@ pub fn tile_biome(coordinate: Coordinate, simplex_2d: &Simplex) -> Tile {
     gen_tile_biome(height, biome)
 }
 
-pub fn pick_empire_locations(empire_count: usize, rows: usize, cols: usize) -> HashSet<HexIndex> {
+pub fn pick_empire_locations(
+    map: &Hex<Tile>,
+    empire_count: usize,
+    rows: usize,
+    cols: usize,
+) -> HashSet<HexIndex> {
     let mut empire_hexes = HashSet::new();
     let mut rng = rand::thread_rng();
 
@@ -52,6 +57,9 @@ pub fn pick_empire_locations(empire_count: usize, rows: usize, cols: usize) -> H
         let col = rng.gen_range(0..cols);
         let index = HexIndex { row, col };
         if empire_hexes.contains(&index) {
+            continue;
+        }
+        if !map.get(index).unwrap().is_spawnable() {
             continue;
         }
         empire_hexes.insert(index);
@@ -69,33 +77,34 @@ fn place_empires(map: &mut Hex<Tile>, empire_locations: HashSet<HexIndex>) -> &m
     let mut empire_id = 0;
     for index in empire_locations {
         let tile = map.get_mut(index).unwrap();
-        tile.building = Some(
-            building::Building {
-                kind: building::BuildingKind::Capital,
-                owner: empire_id,
-            }
-        );
+        tile.building = Some(building::Building {
+            kind: building::BuildingKind::Capital,
+            owner: empire_id,
+        });
         empire_id += 1;
     }
 
     map
 }
 
-pub fn generate() -> WorldState {
-    let rows = 50;
-    let cols = 50;
-    let empire_count = 3;
-
+pub fn generate(config: WorldGenConfig) -> WorldState {
     let simplex_2d = Simplex::new(2);
 
-    let mut map = Hex::new(rows, cols, Default::default());
+    let mut map = Hex::new(config.rows, config.cols, Default::default());
     map.map(|_, index| {
         let coordinate = index.to_coords();
         tile_biome(coordinate, &simplex_2d)
     });
 
-    let empire_locations = pick_empire_locations(empire_count, rows, cols);
+    let empire_locations =
+        pick_empire_locations(&map, config.empire_count, config.rows, config.cols);
     place_empires(&mut map, empire_locations);
 
     WorldState { map }
+}
+
+pub struct WorldGenConfig {
+    pub rows: usize,
+    pub cols: usize,
+    pub empire_count: usize,
 }
