@@ -1,5 +1,4 @@
 use rocket::serde::{Deserialize, Serialize};
-use std::ops::{Index, IndexMut};
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(crate = "rocket::serde")]

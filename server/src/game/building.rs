@@ -1,10 +1,14 @@
-use rocket::serde::{Deserialize, Serialize};
+use rocket::{
+    serde::{Deserialize, Serialize},
+    Build,
+};
+
+use super::resource::Resource;
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Building {
     pub kind: BuildingKind,
-    pub owner: i32,
 }
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
@@ -16,6 +20,18 @@ pub enum BuildingKind {
 impl Building {
     pub fn name(self: &Building) -> String {
         return self.kind.name();
+    }
+
+    pub fn production(self: &Building) -> Vec<(Resource, u32)> {
+        match self.kind {
+            BuildingKind::Capital => {
+                vec![
+                    (Resource::Influence, 1),
+                    (Resource::Wood, 3),
+                    (Resource::Stone, 3),
+                ]
+            }
+        }
     }
 }
 

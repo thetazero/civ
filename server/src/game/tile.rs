@@ -7,6 +7,7 @@ use super::building;
 pub struct Tile {
     pub kind: TileKind,
     pub building: Option<building::Building>,
+    pub owner: Option<usize>,
 }
 
 impl Tile {
@@ -14,6 +15,7 @@ impl Tile {
         Tile {
             kind,
             building: None,
+            owner: None,
         }
     }
 

@@ -6,6 +6,8 @@ use std::collections::HashSet;
 
 use super::building;
 use super::hex::{Coordinate, Hex, HexIndex};
+use super::Game;
+use super::empire::Empire;
 
 const WATER_LEVEL: f32 = 0.2;
 
@@ -79,15 +81,15 @@ fn place_empires(map: &mut Hex<Tile>, empire_locations: HashSet<HexIndex>) -> &m
         let tile = map.get_mut(index).unwrap();
         tile.building = Some(building::Building {
             kind: building::BuildingKind::Capital,
-            owner: empire_id,
         });
+        tile.owner = Some(empire_id);
         empire_id += 1;
     }
 
     map
 }
 
-pub fn generate(config: WorldGenConfig) -> WorldState {
+pub fn generate(config: WorldGenConfig) -> Game {
     let simplex_2d = Simplex::new(2);
 
     let mut map = Hex::new(config.rows, config.cols, Default::default());
@@ -100,11 +102,48 @@ pub fn generate(config: WorldGenConfig) -> WorldState {
         pick_empire_locations(&map, config.empire_count, config.rows, config.cols);
     place_empires(&mut map, empire_locations);
 
-    WorldState { map }
+    let mut empires = vec![];
+
+    for _ in 0..config.empire_count {
+        empires.push(
+            Empire::default()
+        )
+    }
+
+    Game {
+        world_state: WorldState { map },
+        empire_state: empires
+    }
 }
 
 pub struct WorldGenConfig {
     pub rows: usize,
     pub cols: usize,
     pub empire_count: usize,
+}
+
+impl Default for WorldGenConfig {
+    fn default() -> Self {
+        return WorldGenConfig{
+            rows: 10,
+            cols: 10,
+            empire_count: 3
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empire_count(){
+        let mut config = WorldGenConfig::default();
+        config.empire_count = 3;
+
+        let game = generate(config);
+
+        assert_eq!(game.empire_state.len(), 3);
+    }
+
 }
