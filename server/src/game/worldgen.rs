@@ -3,11 +3,13 @@ use crate::game::WorldState;
 use noise::{NoiseFn, Simplex};
 use rand::Rng;
 use std::collections::HashSet;
+use std::sync::{Arc, Mutex};
 
 use super::building;
+use super::empire::Empire;
 use super::hex::{Coordinate, Hex, HexIndex};
 use super::Game;
-use super::empire::Empire;
+
 
 const WATER_LEVEL: f32 = 0.2;
 
@@ -105,14 +107,12 @@ pub fn generate(config: WorldGenConfig) -> Game {
     let mut empires = vec![];
 
     for _ in 0..config.empire_count {
-        empires.push(
-            Empire::default()
-        )
+        empires.push(Empire::default())
     }
 
     Game {
-        world_state: WorldState { map },
-        empire_state: empires
+        world_state: Arc::new(Mutex::new(WorldState { map })),
+        empire_state: Arc::new(Mutex::new(empires)),
     }
 }
 
@@ -124,11 +124,11 @@ pub struct WorldGenConfig {
 
 impl Default for WorldGenConfig {
     fn default() -> Self {
-        return WorldGenConfig{
+        return WorldGenConfig {
             rows: 10,
             cols: 10,
-            empire_count: 3
-        }
+            empire_count: 3,
+        };
     }
 }
 
@@ -137,13 +137,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn empire_count(){
+    fn empire_count() {
         let mut config = WorldGenConfig::default();
         config.empire_count = 3;
 
         let game = generate(config);
 
-        assert_eq!(game.empire_state.len(), 3);
-    }
+        let empire_state = game.empire_state.lock().unwrap();
 
+        assert_eq!(empire_state.len(), 3);
+    }
 }

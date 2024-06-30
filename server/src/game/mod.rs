@@ -1,6 +1,9 @@
+use rocket::serde::{Deserialize, Serialize};
+use std::sync::{Arc, Mutex};
+
+
 use crate::game::hex::Hex;
 use empire::Empire;
-use rocket::serde::{Deserialize, Serialize};
 use worldgen::WorldGenConfig;
 
 pub mod hex;
@@ -20,12 +23,9 @@ pub struct WorldState {
     pub map: Hex<tile::Tile>,
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(crate = "rocket::serde")]
-#[derive(Clone)]
 pub struct Game {
-    pub world_state: WorldState,
-    pub empire_state: Vec<Empire>,
+    pub world_state: Arc<Mutex<WorldState>>,
+    pub empire_state: Arc<Mutex<Vec<Empire>>>,
 }
 
 impl Game {
@@ -41,7 +41,11 @@ impl Game {
         "Game Name".to_string()
     }
 
-    pub fn tick(self: &mut Game) {
+    pub fn tick(self: &Game) {
         tick::tick(self);
+    }
+
+    pub fn ready(self: &Game) -> bool {
+        return true;
     }
 }

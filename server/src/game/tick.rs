@@ -2,8 +2,12 @@ use crate::game::Game;
 
 use super::{empire::Empire, hex::Hex, tile::Tile};
 
-pub fn tick(game: &mut Game) {
-    let (_map, _empire_state) = tick_buildings(&mut game.world_state.map, &mut game.empire_state);
+pub fn tick(game: &Game) {
+    let mut world_state = game.world_state.lock().unwrap();
+
+    let mut empire_state = game.empire_state.lock().unwrap();
+
+    let (_map, _empire_state) = tick_buildings(&mut world_state.map, &mut empire_state);
 }
 
 pub fn tick_buildings<'a, 'b>(
