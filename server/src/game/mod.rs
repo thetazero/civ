@@ -37,10 +37,6 @@ impl Game {
         })
     }
 
-    pub fn name(self: &Game) -> String {
-        "Game Name".to_string()
-    }
-
     pub fn tick(self: &Game) {
         tick::tick(self);
     }

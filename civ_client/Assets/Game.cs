@@ -33,18 +33,17 @@ public class Game : MonoBehaviour
                     GameObject hexObj = SpawnTile(hex.tile.kind, hex.idx);
                     if (hex.tile.building != null)
                     {
-                        SpawnBuilding(hex.tile.building, hexObj);
+                        SpawnBuilding(hex.tile.building, hexObj, hex.tile.owner);
                     }
                 }
             }
         ));
     }
 
-    GameObject SpawnBuilding(BuildingData data, GameObject parentHex)
+    GameObject SpawnBuilding(BuildingData data, GameObject parentHex, Nullable<int> owner)
     {
 
         Debug.Log("Building: " + data.kind);
-        Debug.Log("Building owner: " + data.owner);
 
         GameObject buildingObj = null;
         switch (data.kind)
@@ -57,7 +56,8 @@ public class Game : MonoBehaviour
 
         Material mat = buildingObj.GetComponent<Renderer>().material;
 
-        mat.color = Color.HSVToRGB(data.owner / 10.0f, 1.0f, 1.0f);
+        if (owner != null) mat.color = Color.HSVToRGB(owner.GetValueOrDefault() / 10.0f, 1.0f, 1.0f);
+        else mat.color = Color.magenta;
 
         return buildingObj;
     }
