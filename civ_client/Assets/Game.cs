@@ -22,6 +22,8 @@ public class Game : MonoBehaviour
     private ServerIO serverIO = new ServerIO();
     private float hex_size = 1.0f;
     // Start is called before the first frame update
+
+    private int empire_id = 0;
     void Start()
     {
         StartCoroutine(serverIO.loadAllHex(

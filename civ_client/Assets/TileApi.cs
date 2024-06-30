@@ -6,16 +6,24 @@ using UnityEngine.Networking;
 using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using UnityEditor.UI;
 
 public class TileApi
 {
-    private static string prefix = "http://127.0.0.1:8000/";
+    private string prefix;
 
-    public static UnityWebRequest get_all() {
+    public TileApi(string prefix)
+    {
+        this.prefix = prefix;
+    }
+
+    public UnityWebRequest get_all()
+    {
         return UnityWebRequest.Get(prefix + "tile/all/");
     }
 
-    public static UnityWebRequest get(int row, int col) {
+    public UnityWebRequest get(int row, int col)
+    {
         return UnityWebRequest.Get(prefix + "tile/row/" + row + "/col/" + col);
     }
 }

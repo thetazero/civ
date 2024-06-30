@@ -1,7 +1,7 @@
 use super::resource::Resource;
 use rocket::serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Inventory {
     wood: u32,

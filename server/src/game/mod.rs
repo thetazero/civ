@@ -16,6 +16,8 @@ mod resource;
 mod tick;
 mod worldgen;
 
+pub use inventory::Inventory;
+
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 #[derive(Clone)]

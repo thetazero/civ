@@ -6,18 +6,20 @@ using UnityEngine.Networking;
 using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using UnityEditor;
 
 
 public class ServerIO
 {
-
+    private static string api_root = "http://127.0.0.1:8000/";
+    private static TileApi tileApi = new TileApi(api_root);
 
     public IEnumerator loadHex(
         int row, int col,
         Action<TileData> callback
     )
     {
-        UnityWebRequest req = TileApi.get(row, col);
+        UnityWebRequest req = tileApi.get(row, col);
         yield return req.SendWebRequest();
         if (req.result != UnityWebRequest.Result.Success)
         {
@@ -35,7 +37,7 @@ public class ServerIO
         Action<List<IndexedHex>> callback
     )
     {
-        UnityWebRequest req = TileApi.get_all();
+        UnityWebRequest req = tileApi.get_all();
         yield return req.SendWebRequest();
         if (req.result != UnityWebRequest.Result.Success)
         {
