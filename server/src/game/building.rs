@@ -1,7 +1,4 @@
-use rocket::{
-    serde::{Deserialize, Serialize},
-    Build,
-};
+use rocket::serde::{Deserialize, Serialize};
 
 use super::resource::Resource;
 
@@ -18,10 +15,6 @@ pub enum BuildingKind {
 }
 
 impl Building {
-    pub fn name(self: &Building) -> String {
-        return self.kind.name();
-    }
-
     pub fn production(self: &Building) -> Vec<(Resource, u32)> {
         match self.kind {
             BuildingKind::Capital => {
@@ -31,14 +24,6 @@ impl Building {
                     (Resource::Stone, 3),
                 ]
             }
-        }
-    }
-}
-
-impl BuildingKind {
-    pub fn name(self: &BuildingKind) -> String {
-        match self {
-            BuildingKind::Capital => "Capital".to_string(),
         }
     }
 }

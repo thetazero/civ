@@ -15,6 +15,7 @@ mod inventory;
 mod resource;
 mod tick;
 mod worldgen;
+mod movelist;
 
 pub use inventory::Inventory;
 
@@ -44,6 +45,6 @@ impl Game {
     }
 
     pub fn ready(self: &Game) -> bool {
-        return true;
+        true
     }
 }

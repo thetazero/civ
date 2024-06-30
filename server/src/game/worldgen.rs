@@ -3,13 +3,13 @@ use crate::game::WorldState;
 use noise::{NoiseFn, Simplex};
 use rand::Rng;
 use std::collections::HashSet;
+use std::default;
 use std::sync::{Arc, Mutex};
 
 use super::building;
 use super::empire::Empire;
 use super::hex::{Coordinate, Hex, HexIndex};
 use super::Game;
-
 
 const WATER_LEVEL: f32 = 0.2;
 
@@ -78,20 +78,18 @@ pub fn pick_empire_locations(
 }
 
 fn place_empires(map: &mut Hex<Tile>, empire_locations: HashSet<HexIndex>) -> &mut Hex<Tile> {
-    let mut empire_id = 0;
-    for index in empire_locations {
+    for (empire_id, index) in empire_locations.into_iter().enumerate() {
         let tile = map.get_mut(index).unwrap();
         tile.building = Some(building::Building {
             kind: building::BuildingKind::Capital,
         });
         tile.owner = Some(empire_id);
-        empire_id += 1;
     }
 
     map
 }
 
-pub fn generate(config: WorldGenConfig) -> Game {
+pub fn generate_map(config: &WorldGenConfig) -> Hex<Tile> {
     let simplex_2d = Simplex::new(2);
 
     let mut map = Hex::new(config.rows, config.cols, Default::default());
@@ -99,6 +97,11 @@ pub fn generate(config: WorldGenConfig) -> Game {
         let coordinate = index.to_coords();
         tile_biome(coordinate, &simplex_2d)
     });
+    map
+}
+
+pub fn generate(config: WorldGenConfig) -> Game {
+    let mut map = generate_map(&config);
 
     let empire_locations =
         pick_empire_locations(&map, config.empire_count, config.rows, config.cols);
@@ -122,13 +125,23 @@ pub struct WorldGenConfig {
     pub empire_count: usize,
 }
 
-impl Default for WorldGenConfig {
-    fn default() -> Self {
-        return WorldGenConfig {
+impl WorldGenConfig {
+    fn tiny() -> Self {
+        WorldGenConfig {
             rows: 10,
             cols: 10,
             empire_count: 3,
-        };
+        }
+    }
+}
+
+impl Default for WorldGenConfig {
+    fn default() -> Self {
+        WorldGenConfig {
+            rows: 10,
+            cols: 10,
+            empire_count: 3,
+        }
     }
 }
 
@@ -138,7 +151,7 @@ mod tests {
 
     #[test]
     fn empire_count() {
-        let mut config = WorldGenConfig::default();
+        let mut config = WorldGenConfig::tiny();
         config.empire_count = 3;
 
         let game = generate(config);
@@ -146,5 +159,19 @@ mod tests {
         let empire_state = game.empire_state.lock().unwrap();
 
         assert_eq!(empire_state.len(), 3);
+    }
+
+    #[test]
+    fn tile_populted() {
+        let mut config = WorldGenConfig::tiny();
+        config.empire_count = 3;
+
+        let game = generate(config);
+
+        let world_state = game.world_state.lock().unwrap();
+
+        world_state.map.for_each(|_, tile| {
+            assert_ne!(tile.kind, TileKind::Unknown);
+        });
     }
 }

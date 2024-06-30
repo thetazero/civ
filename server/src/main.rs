@@ -2,9 +2,9 @@ use game::Game;
 use rocket::serde::json::Json;
 use rocket::State;
 
+mod empire_endpoint;
 mod game;
 mod tile_endpoint;
-mod empire_endpoint;
 
 #[macro_use]
 extern crate rocket;
@@ -16,21 +16,28 @@ fn index() -> &'static str {
 
 #[get("/")]
 async fn tick(game: &State<Game>) -> Json<bool> {
-    if game.ready() {
-        // TODO: Launch tick in background
-        game.tick();
-        return Json(true);
+    match game.ready() {
+        true => {
+            game.tick();
+            Json(true)
+        }
+        false => Json(false),
     }
-    return Json(false);
 }
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
     let _rocket = rocket::build()
         .mount("/", routes![index])
-        .mount("/tile", routes![tile_endpoint::get_tile, tile_endpoint::all_tiles])
+        .mount(
+            "/tile",
+            routes![tile_endpoint::get_tile, tile_endpoint::all_tiles],
+        )
         .mount("/tick", routes![tick])
-        .mount("/empire", routes![empire_endpoint::get_inventory, empire_endpoint::count])
+        .mount(
+            "/empire",
+            routes![empire_endpoint::get_inventory, empire_endpoint::count],
+        )
         .manage(Game::new())
         .launch()
         .await?;

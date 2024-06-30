@@ -35,7 +35,7 @@ impl Tile {
 
 
 
-#[derive(Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Eq, Debug)]
 #[serde(crate = "rocket::serde")]
 pub enum TileKind {
     Desert,

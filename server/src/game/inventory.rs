@@ -37,7 +37,7 @@ impl Inventory {
 
 impl Default for Inventory {
     fn default() -> Inventory {
-        return Inventory::empty();
+        Inventory::empty()
     }
 }
 
