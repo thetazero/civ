@@ -11,8 +11,8 @@ pub struct Hex<T> {
 #[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone, Copy)]
 #[serde(crate = "rocket::serde")]
 pub struct HexIndex {
-    pub row: usize,
-    pub col: usize,
+    pub row: i32,
+    pub col: i32,
 }
 
 pub enum HexDirection {
@@ -33,20 +33,25 @@ pub struct Coordinate {
 // based on: https://www.redblobgames.com/grids/hexagons/
 // odd-r offset coordinates
 impl<T: Clone> Hex<T> {
-    pub fn get(&self, index: HexIndex) -> Option<&T> {
-        self.data.get(index.row).and_then(|row| row.get(index.col))
+    pub fn get(&self, index: HexIndex) -> Option<T> {
+        self.data
+            .get(index.row as usize)
+            .and_then(|row| row.get(index.col as usize))
+            .cloned()
     }
 
     pub fn set(&mut self, index: HexIndex, value: T) {
-        if let Some(row) = self.data.get_mut(index.row) {
-            if let Some(tile) = row.get_mut(index.col) {
+        if let Some(row) = self.data.get_mut(index.row as usize) {
+            if let Some(tile) = row.get_mut(index.col as usize) {
                 *tile = value;
             }
-        } 
+        }
     }
 
     pub fn get_mut(&mut self, index: HexIndex) -> Option<&mut T> {
-        self.data.get_mut(index.row).and_then(|row| row.get_mut(index.col))
+        self.data
+            .get_mut(index.row as usize)
+            .and_then(|row| row.get_mut(index.col as usize))
     }
 
     pub fn new(rows: usize, cols: usize, default: T) -> Self {
@@ -65,7 +70,7 @@ impl<T: Clone> Hex<T> {
     pub fn map(&mut self, map: impl Fn(&T, HexIndex) -> T) -> &mut Hex<T> {
         for (i, row) in self.data.iter_mut().enumerate() {
             for (j, tile) in row.iter_mut().enumerate() {
-                let index = HexIndex { row: i, col: j };
+                let index = HexIndex { row: i as i32, col: j as i32 };
                 let location = index.to_coords();
                 println!("{:?} {:?}", index, location);
                 *tile = map(tile, index);
@@ -77,7 +82,10 @@ impl<T: Clone> Hex<T> {
     pub fn for_each(&self, mut action: impl FnMut(&HexIndex, &T)) {
         for (i, row) in self.data.iter().enumerate() {
             for (j, tile) in row.iter().enumerate() {
-                let index = HexIndex { row: i, col: j };
+                let index = HexIndex {
+                    row: i as i32,
+                    col: j as i32,
+                };
                 action(&index, tile);
             }
         }
@@ -159,6 +167,17 @@ impl HexIndex {
         let y = size * 3.0 / 2.0 * self.row as f64;
         Coordinate { x, y }
     }
+
+    pub fn neighbors(self: &HexIndex) -> Vec<HexIndex> {
+        vec![
+            self.offset(&HexDirection::UpRight),
+            self.offset(&HexDirection::Right),
+            self.offset(&HexDirection::DownRight),
+            self.offset(&HexDirection::DownLeft),
+            self.offset(&HexDirection::Left),
+            self.offset(&HexDirection::UpLeft),
+        ]
+    }
 }
 
 #[cfg(test)]
@@ -194,14 +213,23 @@ mod tests {
 
         let index = HexIndex { row: 2, col: 12 };
         assert_eq!(
-            index.offset(&HexDirection::UpRight).offset(&HexDirection::DownLeft),
+            index
+                .offset(&HexDirection::UpRight)
+                .offset(&HexDirection::DownLeft),
             index
         );
 
         let index = HexIndex { row: 3, col: 7 };
         assert_eq!(
-            index.offset(&HexDirection::UpRight).offset(&HexDirection::DownRight).offset(&HexDirection::DownLeft).offset(&HexDirection::Left),
-            index.offset(&HexDirection::UpLeft).offset(&HexDirection::DownLeft).offset(&HexDirection::DownRight)
+            index
+                .offset(&HexDirection::UpRight)
+                .offset(&HexDirection::DownRight)
+                .offset(&HexDirection::DownLeft)
+                .offset(&HexDirection::Left),
+            index
+                .offset(&HexDirection::UpLeft)
+                .offset(&HexDirection::DownLeft)
+                .offset(&HexDirection::DownRight)
         );
     }
 }

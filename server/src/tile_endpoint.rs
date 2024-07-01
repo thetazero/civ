@@ -4,12 +4,12 @@ use rocket::serde::{Deserialize, Serialize};
 use rocket::State;
 
 #[get("/row/<row>/col/<col>")]
-pub async fn get_tile(game: &State<Game>, row: usize, col: usize) -> Json<Tile> {
+pub async fn get_tile(game: &State<Game>, row: i32, col: i32) -> Json<Tile> {
     let world_state = &game.world_state.lock().unwrap();
 
     let tile = world_state.map.get(HexIndex { row, col });
     match tile {
-        Some(tile) => Json(*tile),
+        Some(tile) => Json(tile),
         None => panic!("Tile not found"),
     }
 }

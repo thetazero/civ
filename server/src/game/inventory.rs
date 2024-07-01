@@ -41,6 +41,7 @@ impl Default for Inventory {
     }
 }
 
+#[cfg(test)]
 mod test{
     use super::*;
 

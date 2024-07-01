@@ -2,16 +2,17 @@ use rocket::serde::{Deserialize, Serialize};
 
 use super::resource::Resource;
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Debug)]
 #[serde(crate = "rocket::serde")]
 pub struct Building {
     pub kind: BuildingKind,
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, PartialEq, Eq)]
 #[serde(crate = "rocket::serde")]
 pub enum BuildingKind {
     Capital,
+    City,
 }
 
 impl Building {
@@ -23,6 +24,9 @@ impl Building {
                     (Resource::Wood, 3),
                     (Resource::Stone, 3),
                 ]
+            }
+            BuildingKind::City => {
+                vec![]
             }
         }
     }

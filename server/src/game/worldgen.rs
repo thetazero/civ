@@ -3,10 +3,9 @@ use crate::game::WorldState;
 use noise::{NoiseFn, Simplex};
 use rand::Rng;
 use std::collections::HashSet;
-use std::default;
 use std::sync::{Arc, Mutex};
 
-use super::building;
+use super::city::{self, CitiesState, City};
 use super::empire::Empire;
 use super::hex::{Coordinate, Hex, HexIndex};
 use super::Game;
@@ -52,6 +51,7 @@ pub fn pick_empire_locations(
     cols: usize,
 ) -> HashSet<HexIndex> {
     let mut empire_hexes = HashSet::new();
+    let mut unspawnable_hexes = HashSet::new();
     let mut rng = rand::thread_rng();
 
     let mut empires_created = 0;
@@ -59,14 +59,24 @@ pub fn pick_empire_locations(
     for _ in 0..max_atempts {
         let row = rng.gen_range(0..rows);
         let col = rng.gen_range(0..cols);
-        let index = HexIndex { row, col };
-        if empire_hexes.contains(&index) {
+        let index = HexIndex {
+            row: row as i32,
+            col: col as i32,
+        };
+        if unspawnable_hexes.contains(&index) {
             continue;
         }
         if !map.get(index).unwrap().is_spawnable() {
             continue;
         }
+
         empire_hexes.insert(index);
+
+        unspawnable_hexes.insert(index);
+        index.neighbors().iter().for_each(|idx| {
+            unspawnable_hexes.insert(*idx);
+        });
+
         empires_created += 1;
         if empires_created == empire_count {
             return empire_hexes;
@@ -77,16 +87,16 @@ pub fn pick_empire_locations(
     );
 }
 
-fn place_empires(map: &mut Hex<Tile>, empire_locations: HashSet<HexIndex>) -> &mut Hex<Tile> {
+fn place_empires<'a>(
+    map: &'a mut Hex<Tile>,
+    cities: &mut CitiesState,
+    empire_locations: HashSet<HexIndex>,
+) {
     for (empire_id, index) in empire_locations.into_iter().enumerate() {
-        let tile = map.get_mut(index).unwrap();
-        tile.building = Some(building::Building {
-            kind: building::BuildingKind::Capital,
-        });
-        tile.owner = Some(empire_id);
+        let city_id = cities.next_id();
+        let city = City::new_capital(empire_id, city_id, &index, map);
+        cities.cities.insert(city_id, city);
     }
-
-    map
 }
 
 pub fn generate_map(config: &WorldGenConfig) -> Hex<Tile> {
@@ -102,10 +112,11 @@ pub fn generate_map(config: &WorldGenConfig) -> Hex<Tile> {
 
 pub fn generate(config: WorldGenConfig) -> Game {
     let mut map = generate_map(&config);
+    let mut cities_state = CitiesState::default();
 
     let empire_locations =
         pick_empire_locations(&map, config.empire_count, config.rows, config.cols);
-    place_empires(&mut map, empire_locations);
+    place_empires(&mut map, &mut cities_state, empire_locations);
 
     let mut empires = vec![];
 
@@ -114,7 +125,10 @@ pub fn generate(config: WorldGenConfig) -> Game {
     }
 
     Game {
-        world_state: Arc::new(Mutex::new(WorldState { map })),
+        world_state: Arc::new(Mutex::new(WorldState {
+            map,
+            cities: cities_state,
+        })),
         empire_state: Arc::new(Mutex::new(empires)),
     }
 }
@@ -126,7 +140,7 @@ pub struct WorldGenConfig {
 }
 
 impl WorldGenConfig {
-    fn tiny() -> Self {
+    pub fn tiny() -> Self {
         WorldGenConfig {
             rows: 10,
             cols: 10,
@@ -162,7 +176,7 @@ mod tests {
     }
 
     #[test]
-    fn tile_populted() {
+    fn tile_populated() {
         let mut config = WorldGenConfig::tiny();
         config.empire_count = 3;
 

@@ -1,22 +1,24 @@
+use city::CitiesState;
 use rocket::serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
-
-use crate::game::hex::Hex;
 use empire::Empire;
 use worldgen::WorldGenConfig;
 
 pub mod hex;
 pub mod tile;
 
+mod actions;
 mod building;
+mod city;
 mod empire;
 mod inventory;
+mod movelist;
 mod resource;
 mod tick;
 mod worldgen;
-mod movelist;
 
+pub use hex::Hex;
 pub use inventory::Inventory;
 
 #[derive(Serialize, Deserialize)]
@@ -24,6 +26,7 @@ pub use inventory::Inventory;
 #[derive(Clone)]
 pub struct WorldState {
     pub map: Hex<tile::Tile>,
+    pub cities: CitiesState,
 }
 
 pub struct Game {

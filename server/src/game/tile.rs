@@ -8,6 +8,7 @@ pub struct Tile {
     pub kind: TileKind,
     pub building: Option<building::Building>,
     pub owner: Option<usize>,
+    pub city: Option<usize>
 }
 
 impl Tile {
@@ -16,6 +17,7 @@ impl Tile {
             kind,
             building: None,
             owner: None,
+            city: None
         }
     }
 
