@@ -2,9 +2,11 @@ use game::Game;
 use rocket::serde::json::Json;
 use rocket::State;
 
+mod cities_endpoint;
 mod empire_endpoint;
-mod game;
 mod tile_endpoint;
+
+mod game;
 
 #[macro_use]
 extern crate rocket;
@@ -37,6 +39,10 @@ async fn main() -> Result<(), rocket::Error> {
         .mount(
             "/empire",
             routes![empire_endpoint::get_inventory, empire_endpoint::count],
+        )
+        .mount(
+            "/city",
+            routes![cities_endpoint::get_all, cities_endpoint::get_by_id]
         )
         .manage(Game::new())
         .launch()

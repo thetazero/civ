@@ -5,7 +5,7 @@ use rand::Rng;
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 
-use super::city::{self, CitiesState, City};
+use super::city::{CitiesState, City};
 use super::empire::Empire;
 use super::hex::{Coordinate, Hex, HexIndex};
 use super::Game;

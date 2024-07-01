@@ -1,4 +1,3 @@
-use city::CitiesState;
 use rocket::serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
@@ -18,6 +17,7 @@ mod resource;
 mod tick;
 mod worldgen;
 
+pub use city::{CitiesState, City};
 pub use hex::Hex;
 pub use inventory::Inventory;
 
