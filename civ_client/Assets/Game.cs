@@ -8,6 +8,7 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
 
+    // Tiles:
     public GameObject tileDesert;
     public GameObject tileForest;
     public GameObject tileMountain;
@@ -17,6 +18,10 @@ public class Game : MonoBehaviour
     public GameObject tileBeach;
 
 
+    // tile selector
+    public GameObject hexSelectObj;
+
+
     public GameObject buildingCity;
 
     private ServerIO serverIO = new ServerIO();
@@ -24,6 +29,10 @@ public class Game : MonoBehaviour
     // Start is called before the first frame update
 
     private int empire_id = 0;
+
+
+    // State
+    private Dictionary<HexIndex, GameObject> hexes = new Dictionary<HexIndex, GameObject>();
     void Start()
     {
         StartCoroutine(serverIO.loadAllHex(
@@ -32,14 +41,39 @@ public class Game : MonoBehaviour
                 foreach (IndexedHex hex in data)
                 {
                     // Debug.Log("HexData: " + hex.idx.row + " " + hex.idx.col + " " + hex.tile.kind);
-                    GameObject hexObj = SpawnTile(hex.tile.kind, hex.idx);
+                    GameObject hexObj = SpawnHex(hex.tile.kind, hex.idx);
                     if (hex.tile.building != null)
                     {
                         SpawnBuilding(hex.tile.building, hexObj, hex.tile.owner);
                     }
                 }
+                LoadCities();
             }
         ));
+    }
+
+    void LoadCities() {
+        StartCoroutine(serverIO.loadAllCity(
+            (Dictionary<int, City> data) =>
+            {
+
+                foreach (City city in data.Values)
+                {
+                    SpawnSelector(city);
+                }
+            }
+        ));
+    }
+
+    void SpawnSelector(City cityDaty) {
+        foreach (HexIndex idx in cityDaty.tiles) {
+            Debug.Log(idx.row);
+            Debug.Log(idx.col);
+            GameObject hexObj = hexes[idx];
+            HexSelect hexSelect = hexObj.AddComponent<HexSelect>();
+            hexSelect.init(hexSelectObj);
+            hexSelect.setOwner(cityDaty.owner);
+        }
     }
 
     GameObject SpawnBuilding(BuildingData data, GameObject parentHex, Nullable<int> owner)
@@ -64,7 +98,7 @@ public class Game : MonoBehaviour
         return buildingObj;
     }
 
-    GameObject SpawnTile(TileKind kind, HexIndex idx)
+    GameObject SpawnHex(TileKind kind, HexIndex idx)
     {
 
         GameObject hexObj = null;
@@ -106,6 +140,10 @@ public class Game : MonoBehaviour
             hexObj = Instantiate(hexObj);
             hexObj.transform.position = hex_to_location(idx.row, idx.col, hex_size);
         }
+
+        hexObj.AddComponent<HexSelect>();
+
+        hexes[idx] = hexObj;
 
         return hexObj;
     }

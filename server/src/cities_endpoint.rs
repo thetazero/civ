@@ -1,15 +1,17 @@
-use crate::game::{CitiesState, City, Game};
+use std::collections::HashMap;
+
+use crate::game::{City, Game};
 use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::State;
 
 #[get("/all")]
-pub async fn get_all(game: &State<Game>) -> Json<CitiesState> {
+pub async fn get_all(game: &State<Game>) -> Json<HashMap<usize, City>> {
     let world_state = &game.world_state.lock().unwrap();
 
     let cities = world_state.cities.clone();
 
-    Json(cities)
+    Json(cities.cities)
 }
 
 #[get("/<id>")]
