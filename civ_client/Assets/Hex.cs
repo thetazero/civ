@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class HexSelect : MonoBehaviour
+public class Hex: MonoBehaviour
 {
     private GameObject hexSelector;
 

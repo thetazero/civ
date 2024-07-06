@@ -70,7 +70,7 @@ public class Game : MonoBehaviour
             Debug.Log(idx.row);
             Debug.Log(idx.col);
             GameObject hexObj = hexes[idx];
-            HexSelect hexSelect = hexObj.AddComponent<HexSelect>();
+            Hex hexSelect = hexObj.AddComponent<Hex>();
             hexSelect.init(hexSelectObj);
             hexSelect.setOwner(cityDaty.owner);
         }
@@ -141,7 +141,7 @@ public class Game : MonoBehaviour
             hexObj.transform.position = hex_to_location(idx.row, idx.col, hex_size);
         }
 
-        hexObj.AddComponent<HexSelect>();
+        hexObj.AddComponent<Hex>();
 
         hexes[idx] = hexObj;
 
