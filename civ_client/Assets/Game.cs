@@ -35,16 +35,21 @@ public class Game : MonoBehaviour
     private Dictionary<HexIndex, GameObject> hexes = new Dictionary<HexIndex, GameObject>();
     void Start()
     {
+        Hex.init(hexSelectObj, buildingCity);
+
         StartCoroutine(serverIO.loadAllHex(
             (List<IndexedHex> data) =>
             {
                 foreach (IndexedHex hex in data)
                 {
                     // Debug.Log("HexData: " + hex.idx.row + " " + hex.idx.col + " " + hex.tile.kind);
-                    GameObject hexObj = SpawnHex(hex.tile.kind, hex.idx);
+                    Hex hexControl = SpawnHex(hex.tile.kind, hex.idx);
+                    if (hex.tile.owner.HasValue) {
+                        hexControl.setOwner(hex.tile.owner.Value);
+                    }
                     if (hex.tile.building != null)
                     {
-                        SpawnBuilding(hex.tile.building, hexObj, hex.tile.owner);
+                        hexControl.setBuilding(hex.tile.building);
                     }
                 }
                 LoadCities();
@@ -67,38 +72,13 @@ public class Game : MonoBehaviour
 
     void SpawnSelector(City cityDaty) {
         foreach (HexIndex idx in cityDaty.tiles) {
-            Debug.Log(idx.row);
-            Debug.Log(idx.col);
             GameObject hexObj = hexes[idx];
             Hex hexSelect = hexObj.AddComponent<Hex>();
-            hexSelect.init(hexSelectObj);
             hexSelect.setOwner(cityDaty.owner);
         }
     }
 
-    GameObject SpawnBuilding(BuildingData data, GameObject parentHex, Nullable<int> owner)
-    {
-
-        Debug.Log("Building: " + data.kind);
-
-        GameObject buildingObj = null;
-        switch (data.kind)
-        {
-            case BuildingKind.Capital:
-                buildingObj = Instantiate(buildingCity, parentHex.transform.position, Quaternion.Euler(90, 0, 0), parentHex.transform);
-                break;
-        }
-        buildingObj.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
-
-        Material mat = buildingObj.GetComponent<Renderer>().material;
-
-        if (owner != null) mat.color = Color.HSVToRGB(owner.GetValueOrDefault() / 10.0f, 1.0f, 1.0f);
-        else mat.color = Color.magenta;
-
-        return buildingObj;
-    }
-
-    GameObject SpawnHex(TileKind kind, HexIndex idx)
+    Hex SpawnHex(TileKind kind, HexIndex idx)
     {
 
         GameObject hexObj = null;
@@ -141,11 +121,11 @@ public class Game : MonoBehaviour
             hexObj.transform.position = hex_to_location(idx.row, idx.col, hex_size);
         }
 
-        hexObj.AddComponent<Hex>();
+        Hex hex = hexObj.AddComponent<Hex>();
 
         hexes[idx] = hexObj;
 
-        return hexObj;
+        return hex;
     }
 
     Vector3 hex_to_location(int row, int col, float hex_size)
