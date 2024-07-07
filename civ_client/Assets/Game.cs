@@ -30,6 +30,7 @@ public class Game : MonoBehaviour
 
     private int empire_id = 0;
 
+    public RTS_Camera cameraController;
 
     // State
     private Dictionary<HexIndex, GameObject> hexes = new Dictionary<HexIndex, GameObject>();

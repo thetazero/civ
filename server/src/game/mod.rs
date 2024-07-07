@@ -37,8 +37,8 @@ pub struct Game {
 impl Game {
     pub fn new() -> Self {
         worldgen::generate(WorldGenConfig {
-            rows: 30,
-            cols: 30,
+            rows: 100,
+            cols: 100,
             empire_count: 10,
         })
     }
