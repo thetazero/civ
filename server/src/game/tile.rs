@@ -8,34 +8,8 @@ pub struct Tile {
     pub kind: TileKind,
     pub building: Option<building::Building>,
     pub owner: Option<usize>,
-    pub city: Option<usize>
+    pub city: Option<usize>,
 }
-
-impl Tile {
-    pub fn new(kind: TileKind) -> Self {
-        Tile {
-            kind,
-            building: None,
-            owner: None,
-            city: None
-        }
-    }
-
-    pub fn is_spawnable(self: &Tile) -> bool {
-        match self.kind {
-            TileKind::Desert => true,
-            TileKind::Forest => true,
-            TileKind::Mountain => true,
-            TileKind::SnowyMountain => true,
-            TileKind::Shallows => false,
-            TileKind::Ocean => false,
-            TileKind::Beach => true,
-            TileKind::Unknown => false,
-        }
-    }
-}
-
-
 
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Eq, Debug)]
 #[serde(crate = "rocket::serde")]
@@ -49,4 +23,49 @@ pub enum TileKind {
     Beach,
     #[default]
     Unknown,
+}
+
+impl Tile {
+    pub fn new(kind: TileKind) -> Self {
+        Tile {
+            kind,
+            building: None,
+            owner: None,
+            city: None,
+        }
+    }
+
+    pub const fn is_spawnable(self: &Tile) -> bool {
+        return self.kind.is_spawnable();
+    }
+}
+
+impl TileKind {
+    pub const fn is_spawnable(self: &Self) -> bool {
+        match self {
+            TileKind::Desert => true,
+            TileKind::Forest => true,
+            TileKind::Mountain => true,
+            TileKind::SnowyMountain => true,
+            TileKind::Shallows => false,
+            TileKind::Ocean => false,
+            TileKind::Beach => true,
+            TileKind::Unknown => false,
+        }
+    }
+
+    pub const fn has_trees(self: &Self) -> bool {
+        match self {
+            TileKind::Forest => true,
+            _ => false,
+        }
+    }
+
+    pub const fn has_stone(self: &Self) -> bool {
+        match self {
+            TileKind::Mountain => true,
+            TileKind::SnowyMountain => true,
+            _ => false,
+        }
+    }
 }

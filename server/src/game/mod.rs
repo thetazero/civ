@@ -12,7 +12,6 @@ mod building;
 mod city;
 mod empire;
 mod inventory;
-mod movelist;
 mod resource;
 mod tick;
 mod worldgen;

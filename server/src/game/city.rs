@@ -11,6 +11,7 @@ use super::{
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct CitiesState {
+    /// A map of city_id -> city
     pub cities: HashMap<usize, City>,
     next_id: usize,
 }
@@ -73,7 +74,7 @@ impl City {
 
         let home_tile = map.get_mut(*home_index).unwrap();
         home_tile.building = Some(Building {
-            kind: BuildingKind::Capital,
+            kind: BuildingKind::EmpireCapital,
         });
 
         City {
@@ -94,7 +95,7 @@ impl City {
         tile.city = Some(city_id);
         tile.owner = Some(owner_id);
         tile.building = Some(Building {
-            kind: BuildingKind::City,
+            kind: BuildingKind::Capital,
         });
 
         City {
@@ -150,6 +151,6 @@ mod test {
 
         let cap1_building = map.get(hex_index1).unwrap().building;
         assert_ne!(cap1_building, None);
-        assert_eq!(cap1_building.unwrap().kind, BuildingKind::Capital);
+        assert_eq!(cap1_building.unwrap().kind, BuildingKind::EmpireCapital);
     }
 }
