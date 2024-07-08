@@ -94,10 +94,16 @@ mod test {
         let moves = city_moves(&map, &city, &empire);
         assert_eq!(
             moves,
-            vec![Action::Build(BuildAction {
-                building: BuildingKind::LumberMill,
-                location: i00,
-            })]
+            vec![
+                Action::Build(BuildAction {
+                    building: BuildingKind::LumberMill,
+                    location: i00,
+                }),
+                Action::Build(BuildAction {
+                    building: BuildingKind::Factory,
+                    location: i00,
+                }),
+            ]
         );
 
         map.set(
@@ -117,10 +123,16 @@ mod test {
         let moves = city_moves(&map, &city, &empire);
         assert_eq!(
             moves,
-            vec![Action::Build(BuildAction {
-                building: BuildingKind::Quarry,
-                location: i01,
-            })]
+            vec![
+                Action::Build(BuildAction {
+                    building: BuildingKind::Quarry,
+                    location: i01,
+                }),
+                Action::Build(BuildAction {
+                    building: BuildingKind::Factory,
+                    location: i01,
+                }),
+            ]
         );
 
         map.set(
@@ -133,10 +145,16 @@ mod test {
         let moves = city_moves(&map, &city, &empire);
         assert_eq!(
             moves,
-            vec![Action::Build(BuildAction {
-                building: BuildingKind::Quarry,
-                location: i01,
-            })]
+            vec![
+                Action::Build(BuildAction {
+                    building: BuildingKind::Quarry,
+                    location: i01,
+                }),
+                Action::Build(BuildAction {
+                    building: BuildingKind::Factory,
+                    location: i01,
+                }),
+            ]
         );
     }
 }

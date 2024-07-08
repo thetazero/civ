@@ -8,6 +8,7 @@ pub struct Inventory {
     stone: u32,
     influence: u32,
     food: u32,
+    production: u32,
 }
 
 impl Inventory {
@@ -17,11 +18,12 @@ impl Inventory {
             Resource::Wood => self.wood += amount,
             Resource::Stone => self.stone += amount,
             Resource::Food => self.food += amount,
+            Resource::Production => self.production += amount,
         }
         self
     }
 
-    pub fn add_items(self: &mut Self, resources: Vec<(Resource, u32)>) -> &mut Self{
+    pub fn add_items(self: &mut Self, resources: Vec<(Resource, u32)>) -> &mut Self {
         for (resource, amount) in resources {
             self.add_item(resource, amount);
         }
@@ -34,6 +36,7 @@ impl Inventory {
             stone: 0,
             influence: 0,
             food: 0,
+            production: 0,
         }
     }
 }
@@ -45,7 +48,7 @@ impl Default for Inventory {
 }
 
 #[cfg(test)]
-mod test{
+mod test {
     use super::*;
 
     #[test]
@@ -64,7 +67,7 @@ mod test{
         let produce = vec![
             (Resource::Wood, 3),
             (Resource::Stone, 2),
-            (Resource::Wood, 1)
+            (Resource::Wood, 1),
         ];
 
         empty_inv.add_items(produce);

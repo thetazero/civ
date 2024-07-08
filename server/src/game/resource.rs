@@ -7,4 +7,5 @@ pub enum Resource {
     Stone,
     Food,
     Influence,
+    Production,
 }

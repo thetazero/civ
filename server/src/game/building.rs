@@ -16,13 +16,15 @@ pub enum BuildingKind {
     LumberMill,
     Quarry,
     Farm,
+    Factory,
 }
-pub const ALL_BUILDING_KINDS: [BuildingKind; 5] = [
+pub const ALL_BUILDING_KINDS: [BuildingKind; 6] = [
     BuildingKind::EmpireCapital,
     BuildingKind::Capital,
     BuildingKind::LumberMill,
     BuildingKind::Quarry,
     BuildingKind::Farm,
+    BuildingKind::Factory,
 ];
 
 impl Building {
@@ -42,16 +44,21 @@ impl BuildingKind {
                 ]
             }
             Self::Capital => {
-                vec![]
+                vec![
+                    (Resource::Production, 1)
+                ]
             }
             Self::LumberMill => {
                 vec![(Resource::Wood, 1)]
             }
             Self::Quarry => {
                 vec![(Resource::Stone, 1)]
-            },
+            }
             Self::Farm => {
                 vec![(Resource::Food, 1)]
+            }
+            Self::Factory => {
+                vec![]
             }
         }
     }
@@ -67,10 +74,11 @@ impl BuildingKind {
             Self::LumberMill => tile_kind.has_trees() && city_tile,
             Self::Quarry => tile_kind.has_stone() && city_tile,
             Self::Farm => tile_kind.is_farmable() && city_tile,
+            Self::Factory => tile_kind.is_spawnable() && city_tile,
         }
     }
 
-    pub const fn all() -> &'static [Self; 5] {
+    pub const fn all() -> &'static [Self; 6] {
         &ALL_BUILDING_KINDS
     }
 }
