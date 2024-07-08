@@ -1,11 +1,18 @@
-use super::{building::BuildingKind, tile::Tile, City, Empire, Hex, WorldState};
+use super::{building::BuildingKind, hex::HexIndex, tile::Tile, City, Empire, Hex, WorldState};
 
 use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Debug)]
 #[serde(crate = "rocket::serde")]
 pub enum Action {
-    Build(BuildingKind),
+    Build(BuildAction),
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct BuildAction {
+    pub building: BuildingKind,
+    pub location: HexIndex,
 }
 
 pub fn make_movelists(world_state: WorldState, empire_state: Vec<Empire>) -> Vec<Vec<Action>> {
@@ -31,7 +38,7 @@ pub fn make_movelists(world_state: WorldState, empire_state: Vec<Empire>) -> Vec
     movelists
 }
 
-fn city_moves(map: &Hex<Tile>, city: &City, empire: &Empire) -> Vec<Action> {
+fn city_moves(map: &Hex<Tile>, city: &City, _empire: &Empire) -> Vec<Action> {
     let mut movelist = Vec::new();
 
     for tile_index in &city.tiles {
@@ -41,8 +48,13 @@ fn city_moves(map: &Hex<Tile>, city: &City, empire: &Empire) -> Vec<Action> {
             Some(building) => {}
             None => {
                 for building_kind in BuildingKind::all() {
-                    if building_kind.can_build_on(&tile.kind, true) {
-                        movelist.push(Action::Build(building_kind.clone()));
+                    let can_build = building_kind.can_build_on(&tile.kind, true);
+                    // TODO: Can afford check
+                    if can_build {
+                        movelist.push(Action::Build(BuildAction {
+                            building: *building_kind,
+                            location: *tile_index,
+                        }));
                     }
                 }
             }
@@ -62,6 +74,8 @@ mod test {
     fn test_city_moves() {
         let mut map = Hex::new(2, 2, Default::default());
         let i00 = HexIndex { row: 0, col: 0 };
+        let i01 = HexIndex { row: 0, col: 1 };
+        let i10 = HexIndex { row: 1, col: 0 };
         map.set(
             i00,
             Tile {
@@ -71,13 +85,58 @@ mod test {
         );
 
         let city = City {
-            tiles: vec![i00],
+            tiles: vec![i00, i01],
             owner: 0,
         };
         let empire = Empire {
             inventory: Inventory::empty(),
         };
         let moves = city_moves(&map, &city, &empire);
-        assert_eq!(moves, vec![Action::Build(BuildingKind::LumberMill)])
+        assert_eq!(
+            moves,
+            vec![Action::Build(BuildAction {
+                building: BuildingKind::LumberMill,
+                location: i00,
+            })]
+        );
+
+        map.set(
+            i01,
+            Tile {
+                kind: TileKind::Mountain,
+                ..Default::default()
+            },
+        );
+        map.set(
+            i00,
+            Tile {
+                kind: TileKind::Unknown,
+                ..Default::default()
+            },
+        );
+        let moves = city_moves(&map, &city, &empire);
+        assert_eq!(
+            moves,
+            vec![Action::Build(BuildAction {
+                building: BuildingKind::Quarry,
+                location: i01,
+            })]
+        );
+
+        map.set(
+            i10,
+            Tile {
+                kind: TileKind::Mountain,
+                ..Default::default()
+            },
+        );
+        let moves = city_moves(&map, &city, &empire);
+        assert_eq!(
+            moves,
+            vec![Action::Build(BuildAction {
+                building: BuildingKind::Quarry,
+                location: i01,
+            })]
+        );
     }
 }

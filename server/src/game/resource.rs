@@ -5,5 +5,6 @@ use rocket::serde::{Deserialize, Serialize};
 pub enum Resource {
     Wood,
     Stone,
+    Food,
     Influence,
 }

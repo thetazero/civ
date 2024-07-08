@@ -7,6 +7,7 @@ pub struct Inventory {
     wood: u32,
     stone: u32,
     influence: u32,
+    food: u32,
 }
 
 impl Inventory {
@@ -15,6 +16,7 @@ impl Inventory {
             Resource::Influence => self.influence += amount,
             Resource::Wood => self.wood += amount,
             Resource::Stone => self.stone += amount,
+            Resource::Food => self.food += amount,
         }
         self
     }
@@ -27,11 +29,12 @@ impl Inventory {
     }
 
     pub fn empty() -> Inventory {
-        return Inventory {
+        Inventory {
             wood: 0,
             stone: 0,
             influence: 0,
-        };
+            food: 0,
+        }
     }
 }
 

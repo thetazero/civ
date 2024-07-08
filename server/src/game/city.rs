@@ -8,7 +8,7 @@ use super::{
     tile::Tile,
 };
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Default)]
 #[serde(crate = "rocket::serde")]
 pub struct CitiesState {
     /// A map of city_id -> city
@@ -24,15 +24,6 @@ impl CitiesState {
     }
 }
 
-impl Default for CitiesState {
-    fn default() -> Self {
-        CitiesState {
-            cities: HashMap::new(),
-            next_id: 0,
-        }
-    }
-}
-
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct City {
@@ -40,12 +31,13 @@ pub struct City {
     pub owner: usize,
 }
 
+/// Returns a list of unclaimed tiles neighboring the given hex index
 fn unclaimed_neighbor_tiles(index: &HexIndex, map: &Hex<Tile>) -> Vec<HexIndex> {
     let tiles = index.neighbors();
     tiles
         .iter()
         .filter(|index| match map.get(**index) {
-            Some(tile) => tile.city == None,
+            Some(tile) => tile.city.is_none(),
             None => false,
         })
         .copied()
@@ -59,17 +51,14 @@ impl City {
         home_index: &HexIndex,
         map: &mut Hex<Tile>,
     ) -> City {
-        let map = map;
-
         let mut tiles = unclaimed_neighbor_tiles(home_index, map);
         tiles.push(*home_index);
 
-        tiles.iter().for_each(|index| match map.get_mut(*index) {
-            Some(tile) => {
+        tiles.iter().for_each(|index| {
+            if let Some(tile) = map.get_mut(*index) {
                 tile.city = Some(city_id);
                 tile.owner = Some(owner_id);
             }
-            None => {}
         });
 
         let home_tile = map.get_mut(*home_index).unwrap();

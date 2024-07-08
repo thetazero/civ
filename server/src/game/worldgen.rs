@@ -18,8 +18,10 @@ fn gen_tile_biome(height: f64, biome: f64) -> Tile {
     } else if height <= WATER_LEVEL as f64 {
         Tile::new(TileKind::Shallows)
     } else if height < 0.5 {
-        if biome < 0. {
+        if biome < 0.3 {
             Tile::new(TileKind::Desert)
+        } else if biome < 0. {
+            Tile::new(TileKind::Plains)
         } else {
             Tile::new(TileKind::Forest)
         }
@@ -87,8 +89,8 @@ pub fn pick_empire_locations(
     );
 }
 
-fn place_empires<'a>(
-    map: &'a mut Hex<Tile>,
+fn place_empires(
+    map: &mut Hex<Tile>,
     cities: &mut CitiesState,
     empire_locations: HashSet<HexIndex>,
 ) {

@@ -21,6 +21,7 @@ pub enum TileKind {
     Shallows,
     Ocean,
     Beach,
+    Plains,
     #[default]
     Unknown,
 }
@@ -36,7 +37,7 @@ impl Tile {
     }
 
     pub const fn is_spawnable(self: &Tile) -> bool {
-        return self.kind.is_spawnable();
+        self.kind.is_spawnable()
     }
 }
 
@@ -50,22 +51,20 @@ impl TileKind {
             TileKind::Shallows => false,
             TileKind::Ocean => false,
             TileKind::Beach => true,
+            TileKind::Plains => true,
             TileKind::Unknown => false,
         }
     }
 
     pub const fn has_trees(self: &Self) -> bool {
-        match self {
-            TileKind::Forest => true,
-            _ => false,
-        }
+        matches!(self, TileKind::Forest)
     }
 
     pub const fn has_stone(self: &Self) -> bool {
-        match self {
-            TileKind::Mountain => true,
-            TileKind::SnowyMountain => true,
-            _ => false,
-        }
+        matches!(self, TileKind::Mountain | TileKind::SnowyMountain)
+    }
+
+    pub const fn is_farmable(self: &Self) -> bool {
+        matches!(self, TileKind::Plains)
     }
 }
