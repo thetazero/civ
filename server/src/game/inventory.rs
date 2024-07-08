@@ -4,11 +4,11 @@ use rocket::serde::{Deserialize, Serialize};
 #[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Inventory {
-    wood: u32,
-    stone: u32,
-    influence: u32,
-    food: u32,
-    production: u32,
+    pub wood: u32,
+    pub stone: u32,
+    pub influence: u32,
+    pub food: u32,
+    pub production: u32,
 }
 
 impl Inventory {

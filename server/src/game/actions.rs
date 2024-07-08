@@ -1,4 +1,10 @@
-use super::{building::BuildingKind, hex::HexIndex, tile::Tile, City, Empire, Hex, WorldState};
+use super::{
+    building::{Building, BuildingKind},
+    empire,
+    hex::HexIndex,
+    tile::Tile,
+    City, Empire, Hex, WorldState,
+};
 
 use rocket::serde::{Deserialize, Serialize};
 
@@ -62,6 +68,31 @@ fn city_moves(map: &Hex<Tile>, city: &City, _empire: &Empire) -> Vec<Action> {
     }
 
     movelist
+}
+
+pub fn apply_actions(
+    world_state: &mut WorldState,
+    empire_state: &mut Vec<Empire>,
+    actions: Vec<Vec<Action>>,
+) {
+    for (empire_id, empire_actions) in actions.iter().enumerate() {
+        for action in empire_actions {
+            let empire = empire_state.get_mut(empire_id).unwrap();
+            apply_action(world_state, empire, action)
+        }
+    }
+}
+
+pub fn apply_action(world_state: &mut WorldState, empire_state: &mut Empire, action: &Action) {
+    match action {
+        Action::Build(build_action) => {
+            let tile = world_state.map.get_mut(build_action.location).unwrap();
+            tile.building = Some(Building {
+                kind: build_action.building,
+            });
+            // TODO: Building cost
+        }
+    }
 }
 
 #[cfg(test)]
